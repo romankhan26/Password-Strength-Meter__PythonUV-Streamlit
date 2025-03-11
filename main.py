@@ -5,8 +5,8 @@ import re
 
 st.set_page_config(page_title="Password Strength Meter", page_icon=":key:")
 
-st.title("Password Strength Meter")
-st.subheader("Check the strength of your password")
+st.title("🔐 Password Strength Meter")
+st.subheader("🛡️ Check the strength of your password")
 
 def check_password_strength(password):
     suggestions = []
@@ -47,18 +47,18 @@ def check_password_strength(password):
     # Calculate strength percentage
     strength_percentage = (strength / 5) * 100
     
-    # Determine strength level
+    # Determine strength level with emojis
     if strength_percentage == 100:
-        strength_text = "Very Strong"
+        strength_text = "Very Strong 💪"
         color = "green"
     elif strength_percentage >= 80:
-        strength_text = "Strong"
+        strength_text = "Strong 👍"
         color = "blue"
     elif strength_percentage >= 60:
-        strength_text = "Moderate"
+        strength_text = "Moderate 🤔"
         color = "orange"
     else:
-        strength_text = "Weak"
+        strength_text = "Weak ⚠️"
         color = "red"
 
     return strength_percentage, strength_text, color, suggestions
@@ -71,29 +71,57 @@ def generate_password(length,use_digits,use_special_chars):
         characters += string.punctuation
     return ''.join(random.choice(characters) for _ in range(length))
 
-# Add password input field
-user_password = st.text_input("### Enter your password to check strength", type="password")
+# Add custom CSS for styling
+st.markdown("""
+    <style>
+    .stProgress > div > div > div > div {
+        background-image: linear-gradient(to right, #ff0000, #ffa500, #2196f3, #4caf50);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Password input section with styling
+st.markdown("### 🔑 Enter your password")
+user_password = st.text_input("", type="password", placeholder="Type your password here")
 
 if user_password:
     strength_percentage, strength_text, color, suggestions = check_password_strength(user_password)
     
-    # Display strength meter
-    st.write(f"Password Strength: {strength_text}")
+    # Display strength meter with colored box
+    st.markdown(f"""
+        <div style='
+            padding: 10px;
+            border-radius: 5px;
+            background-color: {"rgba(255, 0, 0, 0.1)" if color == "red" else "rgba(255, 165, 0, 0.1)" if color == "orange" else "rgba(33, 150, 243, 0.1)" if color == "blue" else "rgba(76, 175, 80, 0.1)"};
+            border-left: 5px solid {color};
+            margin: 10px 0;'>
+            <h4 style='color: {color}; margin: 0;'>Password Strength: {strength_text}</h4>
+        </div>
+    """, unsafe_allow_html=True)
+    
     st.progress(int(strength_percentage))
     
-    # Display suggestions if any
+    # Display suggestions if any with improved styling
     if suggestions:
-        st.warning("Suggestions to improve password strength:")
+        st.warning("💡 Suggestions to improve password strength:")
         for suggestion in suggestions:
-            st.write(f"• {suggestion}")
+            st.markdown(f"• {suggestion}")
     elif strength_percentage == 100:
-        st.success("Excellent! Your password meets all security requirements.")
+        st.success("🎉 Excellent! Your password meets all security requirements.")
 
-st.markdown("### OR generate a password")
-length = st.slider("Password Length", min_value=8, max_value=32, value=16)
-use_digits = st.checkbox("Include Digits")
-use_special_chars = st.checkbox("Include Special Characters")
+# Password generator section
+st.markdown("### ⚡ Generate a Strong Password")
+col1, col2 = st.columns(2)
+with col1:
+    length = st.slider("🔢 Password Length", min_value=8, max_value=32, value=16)
+with col2:
+    use_digits = st.checkbox("🔢 Include Digits")
+    use_special_chars = st.checkbox("#️⃣ Include Special Characters")
 
-if st.button("Generate Password"):
+if st.button("🎲 Generate Password", type="primary"):
     password = generate_password(length, use_digits, use_special_chars)
-    st.success(f"Generated Password: {password}")
+    st.success(f"🎯 Generated Password: `{password}`")
+
+# Add footer
+st.markdown("---")
+st.markdown("### 🔐 Keep your passwords safe and strong! 💪")
